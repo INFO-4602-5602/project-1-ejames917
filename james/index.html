@@ -1,50 +1,14 @@
 <html>
 <head>
-<title>Project 0</title>
+<title>Project 1</title>
 <style type="text/css" href="project0.css"></style>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
 <!--Put your D3 import statement between these two lines-->
 <script src="https://d3js.org/d3.v4.js"></script>
 <!--Put your D3 import statement between these two lines-->
+<link rel="stylesheet" href="project1.css">
 </head>
 	
-<style>
-.line {
-  fill: none;
-  stroke: steelblue;
-  stroke-width: 2px;
-}
-	
-body {
-  font: 14px sans-serif;
-}
-	
-.axis path,
-.axis line {
-  fill: none;
-  stroke: #000;
-  shape-rendering: crispEdges;
-}
-	
-.dot {
-  stroke: #000;
-}
-	
-div.tooltip {
-  position: absolute;
-  text-align: center;
-  width: 60px;
-  height: 28px;
-  padding: 2px;
-  font: 12px sans-serif;
-  background: lightsteelblue;
-  border: 0px;
-  border-radius: 8px;
-  pointer-events: none;
-}
-</style>
-
-
 <body>
 	<div id="partOne">
         <h1>Part One: </h1>
@@ -115,7 +79,7 @@ div.tooltip {
 		  .append("g")
 			.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 		
-		//Circle attributes
+		//Circle attributes???
 		var circleAttrs = {
           	cx: function(d) {return x(d.x);},
           	cy: function(d) {return y(d.y);},
@@ -136,6 +100,7 @@ div.tooltip {
 			  d.x = +d.x;
 			  d.y = +d.y;
 		  });
+		
 			
 		//Scale the range of the data
 	   	x.domain(d3.extent(data, function(d) {return d.x;}));
@@ -167,7 +132,7 @@ div.tooltip {
 
 		// Put your part three & four code here ***********************
 		//~~~~~~~~~~~~Part 3~~~~~~~~~~~~~~~~~~
-		var valueline = d3.line()
+		var line = d3.line()
 			.x(function(d) {return x(d.x);})
 			.y(function(d) {return y(d.y);});
 		
@@ -186,7 +151,10 @@ div.tooltip {
 				d.x = +d.x;
 				d.y = +d.y;
 			});
-						 
+					
+			//Sort the data so it doesn't look terrible
+			data.sort(function(a,b) {return a.x-b.x});
+			
 			//Scale the range of the data
 			x.domain(d3.extent(data, function(d) { return d.x; }));
 			y.domain([0, d3.max(data, function(d) { return d.y; })]);
@@ -195,7 +163,7 @@ div.tooltip {
 			graph2.append("path")
 				.data([data])
 				.attr("class", "line")
-				.attr("d", valueline);
+				.attr("d", line);
 			
 			// Add the X Axis
   			graph2.append("g")
@@ -238,9 +206,202 @@ div.tooltip {
 		
 		function handleClick(d, i) {
 			console.log(d);
+			$("#scatterLabel").html("<p>x: " + d.x + " y: " + d.y + "</p>");
 		}
         // Put your part five code here ***********************
-        
+        //Smaller dimesions for smaller graphs
+		var halfWidth = 480 - margin.left - margin.right,
+			halfHeight = 250 - margin.top - margin.bottom,
+			smallX = d3.scaleLinear().range([0,halfWidth]),
+			smallY = d3.scaleLinear().range([halfHeight, 0]),
+			betterMargin = {top: 40, right: 20, bottom: 40, left: 50}
+		
+		//I think I have to change the line so it fits on the smaller graph?
+		var smallLine = d3.line()
+			.x(function(d) {return smallX(d.x);})
+			.y(function(d) {return smallY(d.y);});
+
+		var pt5g1 = d3.select("#partFive")
+		  .append("svg")
+			.attr("width", halfWidth + margin.left + margin.right)
+			.attr("height", halfHeight + betterMargin.top + betterMargin.bottom + 50)
+		  .append("g")
+			.attr("transform", "translate(" + margin.left + "," + betterMargin.top + ")");
+		
+		var pt5g2 = d3.select("#partFive")
+		  .append("svg")
+			.attr("width", halfWidth + margin.left + margin.right)
+			.attr("height", halfHeight + betterMargin.top + betterMargin.bottom + 50)
+		  .append("g")
+			.attr("transform", "translate(" + margin.left + "," + betterMargin.top + ")");
+		
+		var pt5g3 = d3.select("#partFive")
+		  .append("svg")
+			.attr("width", halfWidth + margin.left + margin.right)
+			.attr("height", halfHeight + betterMargin.top + betterMargin.bottom + 50)
+		  .append("g")
+			.attr("transform", "translate(" + margin.left + "," + betterMargin.top + ")");
+		
+		var pt5g4 = d3.select("#partFive")
+		  .append("svg")
+			.attr("width", halfWidth + margin.left + margin.right)
+			.attr("height", halfHeight + betterMargin.top + betterMargin.bottom + 50)
+		  .append("g")
+			.attr("transform", "translate(" + margin.left + "," + betterMargin.top + ")");
+		
+		d3.csv("/anscombe_I.csv", function(error, data) {
+			if (error) throw error;
+			
+			data.forEach(function(d) {
+				d.x = +d.x;
+				d.y = +d.y;
+			});
+			
+			//Sort the data so it doesn't look awful
+			data.sort(function(a,b) {return a.x-b.x});
+			
+			//Scale the range of the data
+			smallX.domain(d3.extent(data, function(d) {return d.x;}));
+			smallY.domain([0, d3.max(data, function(d) {return d.y;})]);
+
+			//Add valueline
+			pt5g1.append("path")
+				.data([data])
+				.attr("class", "line")
+				.attr("d", smallLine);
+			
+			// Add the X Axis
+  			pt5g1.append("g")
+      			.attr("transform", "translate(0," + halfHeight + ")")
+      			.call(d3.axisBottom(smallX));
+
+  			// Add the Y Axis
+  			pt5g1.append("g")
+      			.call(d3.axisLeft(smallY));
+			
+			pt5g1.append("text")
+			    .attr("x", (halfWidth / 2))             
+        		.attr("y", 0 - (margin.top / 2))
+				.attr("text-anchor", "middle")
+				.style("font-size", "16px") 
+        		.style("text-decoration", "underline")  
+        		.text("Graph of anscombe_I");
+		});
+		
+		d3.csv("/anscombe_II.csv", function(error, data) {
+			if (error) throw error;
+		
+			data.forEach(function(d) {
+				d.x = +d.x;
+				d.y = +d.y;
+			});
+			
+			data.sort(function(a,b) {return a.x-b.x});
+			
+			//Scale the range of the data
+			smallX.domain(d3.extent(data, function(d) {return d.x;}));
+			smallY.domain([0, d3.max(data, function(d) {return d.y;})]);
+
+			//Add valueline
+			pt5g2.append("path")
+				.data([data])
+				.attr("class", "line")
+				.attr("d", smallLine);
+			
+			// Add the X Axis
+  			pt5g2.append("g")
+      			.attr("transform", "translate(0," + halfHeight + ")")
+      			.call(d3.axisBottom(smallX));
+
+  			// Add the Y Axis
+  			pt5g2.append("g")
+      			.call(d3.axisLeft(smallY));
+			
+			pt5g2.append("text")
+			    .attr("x", (halfWidth / 2))             
+        		.attr("y", 0 - (margin.top / 2))
+				.attr("text-anchor", "middle")
+				.style("font-size", "16px") 
+        		.style("text-decoration", "underline")  
+        		.text("Graph of anscombe_II");
+		});
+		
+		d3.csv("/anscombe_III.csv", function(error, data) {
+			if (error) throw error;
+		
+			data.forEach(function(d) {
+				d.x = +d.x;
+				d.y = +d.y;
+			});
+			
+			data.sort(function(a,b) {return a.x-b.x});
+			
+			//Scale the range of the data
+			smallX.domain(d3.extent(data, function(d) {return d.x;}));
+			smallY.domain([0, d3.max(data, function(d) {return d.y;})]);
+
+			//Add valueline
+			pt5g3.append("path")
+				.data([data])
+				.attr("class", "line")
+				.attr("d", smallLine);
+			
+			// Add the X Axis
+  			pt5g3.append("g")
+      			.attr("transform", "translate(0," + halfHeight + ")")
+      			.call(d3.axisBottom(smallX));
+
+  			// Add the Y Axis
+  			pt5g3.append("g")
+      			.call(d3.axisLeft(smallY));
+			
+			pt5g3.append("text")
+			    .attr("x", (halfWidth / 2))             
+        		.attr("y", 0 - (margin.top / 2))
+				.attr("text-anchor", "middle")
+				.style("font-size", "16px") 
+        		.style("text-decoration", "underline")  
+        		.text("Graph of anscombe_III");
+		});
+		
+		d3.csv("/anscombe_IV.csv", function(error, data) {
+			if (error) throw error;
+		
+			data.forEach(function(d) {
+				d.x = +d.x;
+				d.y = +d.y;
+			});
+			
+			data.sort(function(a,b) {return a.x-b.x});
+			
+			//Scale the range of the data
+			smallX.domain(d3.extent(data, function(d) {return d.x;}));
+			smallY.domain([0, d3.max(data, function(d) {return d.y;})]);
+
+			//Add valueline
+			pt5g4.append("path")
+				.data([data])
+				.attr("class", "line")
+				.attr("d", smallLine);
+			
+			// Add the X Axis
+  			pt5g4.append("g")
+      			.attr("transform", "translate(0," + halfHeight + ")")
+      			.call(d3.axisBottom(smallX));
+
+  			// Add the Y Axis
+  			pt5g4.append("g")
+      			.call(d3.axisLeft(smallY));
+			
+			pt5g4.append("text")
+			    .attr("x", (halfWidth / 2))             
+        		.attr("y", 0 - (margin.top / 2))
+				.attr("text-anchor", "middle")
+				.style("font-size", "16px") 
+        		.style("text-decoration", "underline")  
+        		.text("Graph of anscombe_IV");
+		});
+		
     </script>
 </body>
 
